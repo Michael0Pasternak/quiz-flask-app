@@ -239,8 +239,9 @@ def get_leaderboard(limit=50):
         )
         rows = cur.fetchall()
 
-    # rows = [(user_id, username, points), ...] -> [{'user_id':..., 'username':..., 'points':...}, ...]
+    # rows: [(user_id, username, points), ...]
     return [{"user_id": r[0], "username": r[1], "points": r[2]} for r in rows]
+
 
 
 
