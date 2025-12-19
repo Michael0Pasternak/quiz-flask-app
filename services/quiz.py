@@ -220,26 +220,21 @@ def get_result_rank_in_quiz(result_id: int) -> int:
     return ids.index(result_id) + 1 if result_id in ids else 0
 
 
-def get_leaderboard(limit: int = 50) -> List[Dict[str, Any]]:
-    """
-    Рейтинг по сумме points по всем попыткам.
-    """
+def get_leaderboard(limit=50):
     db = get_db()
     with db.cursor() as cur:
-        cur.execute(
-            """
-            SELECT u.id, u.username, COALESCE(SUM(r.points), 0) AS points
-            FROM users u
-            LEFT JOIN results r ON r.user_id = u.id
+        cur.execute("""
+            SELECT
+              u.id,
+              u.username,
+              COALESCE(SUM(r.score), 0) AS points
+            FROM results r
+            JOIN users u ON u.id = r.user_id
             GROUP BY u.id, u.username
-            ORDER BY points DESC, u.username ASC
+            ORDER BY points DESC
             LIMIT %s
-            """,
-            (limit,),
-        )
-        rows = cur.fetchall()
-
-    return [{"user_id": r[0], "username": r[1], "points": int(r[2])} for r in rows]
+        """, (limit,))
+        return cur.fetchall()
 
 
 # =========================

@@ -1,15 +1,16 @@
 import os
 from pathlib import Path
 
-BASE_DIR = Path(__file__).resolve().parent
+BASE_DIR = Path(__file__).resolve().parent  # Исправлено: добавил __ перед file
+
 
 class Config:
     SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-key-change-me")
 
-    # Правильно: в getenv первым аргументом идёт ИМЯ переменной, вторым — значение по умолчанию
+    # Новая база данных для приложения
     DATABASE_URL = os.getenv(
         "DATABASE_URL",
-        "postgresql://quizzizw:13giI2TULC5OC6d89nUj8KuR8KHKAwy5@dpg-d52kgcmmcj7s73bqg7dg-a.virginia-postgres.render.com/quizzizq"
+        "postgresql://quizdbuser:5L7uW8YetOVBq6nTkxyGOX5LxLwW5FMc@dpg-d52l9bemcj7s73br0stg-a.virginia-postgres.render.com/quizdb_kbqg"
     )
 
     UPLOAD_FOLDER = os.getenv("UPLOAD_FOLDER", str(BASE_DIR / "static" / "uploads" / "quizzes"))
