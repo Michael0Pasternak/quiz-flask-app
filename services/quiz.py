@@ -223,7 +223,8 @@ def get_result_rank_in_quiz(result_id: int) -> int:
 def get_leaderboard(limit=50):
     db = get_db()
     with db.cursor() as cur:
-        cur.execute("""
+        cur.execute(
+            """
             SELECT
               u.id,
               u.username,
@@ -233,7 +234,9 @@ def get_leaderboard(limit=50):
             GROUP BY u.id, u.username
             ORDER BY points DESC
             LIMIT %s
-        """, (limit,))
+            """,
+            (limit,),
+        )
         return cur.fetchall()
 
 
