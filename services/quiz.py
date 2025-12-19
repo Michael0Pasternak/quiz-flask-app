@@ -226,7 +226,7 @@ def get_leaderboard(limit=50):
         cur.execute(
             """
             SELECT
-              u.id,
+              u.id AS user_id,
               u.username,
               COALESCE(SUM(r.score), 0) AS points
             FROM results r
@@ -237,7 +237,11 @@ def get_leaderboard(limit=50):
             """,
             (limit,),
         )
-        return cur.fetchall()
+        rows = cur.fetchall()
+
+    # rows = [(user_id, username, points), ...] -> [{'user_id':..., 'username':..., 'points':...}, ...]
+    return [{"user_id": r[0], "username": r[1], "points": r[2]} for r in rows]
+
 
 
 # =========================
