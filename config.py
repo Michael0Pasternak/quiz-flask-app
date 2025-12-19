@@ -9,7 +9,7 @@ class Config:
     # Правильно: в getenv первым аргументом идёт ИМЯ переменной, вторым — значение по умолчанию
     DATABASE_URL = os.getenv(
         "DATABASE_URL",
-        "postgresql://quizuser:quizpass@127.0.0.1:5432/quizdb"
+        "postgresql://quizzizw:13giI2TULC5OC6d89nUj8KuR8KHKAwy5@dpg-d52kgcmmcj7s73bqg7dg-a.virginia-postgres.render.com/quizzizq"
     )
 
     UPLOAD_FOLDER = os.getenv("UPLOAD_FOLDER", str(BASE_DIR / "static" / "uploads" / "quizzes"))
