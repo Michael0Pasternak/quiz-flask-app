@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+{% block content %}
+<h2 style="margin-bottom:14px;">Рейтинг игроков</h2>
+
+<div class="lb">
+  {% for row in items %}
+    <div class="lb-row">
+      <div class="lb-left">
+        <div class="lb-avatar">
+          {{ row.username[:1]|upper }}
+          <div class="lb-rank">{{ loop.index }}</div>
+        </div>
+
+        <div class="lb-name">{{ row.username }}</div>
+      </div>
+
+      <div class="lb-points">
+        <span class="lb-points-value">{{ "{:,}".format(row.points).replace(",", " ") }}</span>
+        <span class="lb-points-label">баллов</span>
+      </div>
+    </div>
+  {% else %}
+    <div class="muted">Пока нет результатов.</div>
+  {% endfor %}
+</div>
+{% endblock %}

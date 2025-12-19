@@ -1,0 +1,34 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<section class="qz-page">
+  <div class="qz-page__head">
+    <h1 class="qz-page__title">Викторины</h1>
+
+    <form class="qz-search" method="get" action="{{ url_for('quizzes') }}">
+      <input class="qz-search__input" type="text" name="q" value="{{ q or '' }}" placeholder="Поиск по названию">
+      <button class="qz-search__btn" type="submit" aria-label="Искать">🔍</button>
+    </form>
+  </div>
+
+  <div class="qz-grid">
+    {% for quiz in quizzes %}
+      <a class="qz-card" href="{{ url_for('quiz_detail', quiz_id=quiz.id) }}">
+        <div class="qz-card__img">
+          {% if quiz.image_path %}
+            <img src="{{ url_for('static', filename=quiz.image_path) }}" alt="">
+          {% else %}
+            <div class="qz-card__placeholder"></div>
+          {% endif %}
+        </div>
+
+        <div class="qz-card__body">
+          <div class="qz-card__title">{{ quiz.title }}</div>
+          <div class="qz-card__sub">{{ quiz.subtitle or '' }}</div>
+        </div>
+      </a>
+    {% endfor %}
+  </div>
+</section>
+
+{% endblock %}

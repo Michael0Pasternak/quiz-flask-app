@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}QuizService{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prosto+One&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  {% block head %}{% endblock %}
+</head>
+
+<body class="{% block body_class %}{% endblock %}">
+  <header class="site-header">
+    <div class="wrap header-grid">
+      <nav class="nav nav-left">
+        <a href="{{ url_for('quizzes') }}">Викторины</a>
+        <a href="{{ url_for('leaderboard') }}">Таблица лидеров</a>
+      </nav>
+
+      <a class="brand" href="{{ url_for('index') }}">
+        <img class="brand-logo" src="{{ url_for('static', filename='img/logo.png') }}" alt="Quiziz">
+      </a>
+
+      <nav class="nav nav-right">
+        {% if session.get("user_id") %}
+          <a href="{{ url_for('logout') }}">Выход</a>
+          {% if session.get("role") == "admin" %}
+            <a class="btn btnSmall" href="{{ url_for('admin_panel') }}">Админ</a>
+          {% endif %}
+        {% else %}
+          <a href="{{ url_for('register') }}">Регистрация</a>
+          <a class="btn btnSmall" href="{{ url_for('login') }}">Войти</a>
+        {% endif %}
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer>
+    <div class="wrap muted">Flask + PostgreSQL</div>
+  </footer>
+
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

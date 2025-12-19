@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+{% block content %}
+  <h2>{{ quiz.title }}</h2>
+  <p class="muted">{{ quiz.subtitle }}</p>
+
+  {% if quiz.image_path %}
+    <img class="hero" src="{{ url_for('static', filename=quiz.image_path) }}" alt="quiz image">
+  {% endif %}
+
+  <div class="actions">
+    {% if current_user.id %}
+      <a class="btn" href="{{ url_for('quiz_pass', quiz_id=quiz.id) }}">Начать</a>
+    {% else %}
+      <a class="btn" href="{{ url_for('login') }}">Войти, чтобы пройти</a>
+    {% endif %}
+  </div>
+{% endblock %}

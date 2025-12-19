@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+{% block content %}
+<h2>Викторины</h2>
+
+<form class="row" method="get">
+  <input name="q" placeholder="Поиск по названию..." value="{{ q }}">
+  <button class="btn" type="submit">Искать</button>
+</form>
+
+<div class="grid">
+  {% for quiz in quizzes %}
+    <div class="card">
+      <h3>{{ quiz.title }}</h3>
+      <p class="muted">{{ quiz.subtitle }}</p>
+      {% if quiz.image_path %}
+        <img class="thumb" src="{{ url_for('static', filename=quiz.image_path) }}" alt="quiz image">
+      {% endif %}
+      <div class="actions">
+        <a class="btn" href="{{ url_for('quiz_detail', quiz_id=quiz.id) }}">Открыть</a>
+      </div>
+    </div>
+  {% else %}
+    <p class="muted">Ничего не найдено.</p>
+  {% endfor %}
+</div>
+{% endblock %}

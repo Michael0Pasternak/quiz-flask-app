@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+{% block content %}
+<section class="quiz-detail">
+
+  <h1 class="quiz-title">{{ quiz.title }}</h1>
+
+  <p class="quiz-subtitle">
+    {{ quiz.subtitle }}
+  </p>
+
+  {% if quiz.image_path %}
+    <div class="quiz-hero">
+      <img src="{{ url_for('static', filename=quiz.image_path) }}" alt="quiz image">
+    </div>
+  {% endif %}
+
+  <div class="quiz-actions">
+    {% if current_user.id %}
+      <a class="btn quiz-start-btn" href="{{ url_for('quiz_pass', quiz_id=quiz.id) }}">
+        Начать
+      </a>
+    {% else %}
+      <a class="btn quiz-start-btn" href="{{ url_for('login') }}">
+        Войти, чтобы пройти
+      </a>
+    {% endif %}
+  </div>
+
+</section>
+{% endblock %}

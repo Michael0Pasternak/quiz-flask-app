@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+{% block title %}Главная{% endblock %}
+{% block body_class %}home{% endblock %}
+
+{% block content %}
+<div class="home-main">
+  <section class="home-hero">
+
+    <h1 class="home-title">Создавайте и проводите викторины</h1>
+    <h2 class="home-subtitle">учитесь, проверяйте знания и<br>развивайтесь</h2>
+
+    <p class="home-text">
+      Сервис, который превращает обучение и оценку знаний<br>
+      в увлекательную игру с моментальными результатами!
+    </p>
+
+    <div class="home-actions">
+      <a class="btn home-btn" href="{{ url_for('quizzes') }}">Пройти викторину</a>
+    </div>
+
+    <div class="home-image">
+      <img src="{{ url_for('static', filename='img/hero.png') }}" alt="Hero">
+    </div>
+
+  </section>
+</div>
+{% endblock %}

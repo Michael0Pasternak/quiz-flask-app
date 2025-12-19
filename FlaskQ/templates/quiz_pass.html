@@ -1,0 +1,131 @@
+{% extends "layout.html" %}
+{% block content %}
+<h2>Прохождение: {{ quiz.title }}</h2>
+
+<div class="quiz-top">
+  <div class="muted" id="qCounter">Вопрос 1/{{ questions|length }}</div>
+
+  <div class="timer">
+    <div class="muted">Осталось времени</div>
+    <div class="timer-value" id="timerValue">--:--</div>
+  </div>
+
+  <div class="progress">
+    <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+  </div>
+</div>
+
+
+<form method="post" class="quiz-wrap" id="quizForm">
+    <input type="hidden" name="duration_seconds" id="duration_seconds" value="0">
+  {% for q in questions %}
+  <section class="quiz-card quiz-question" data-index="{{ loop.index0 }}">
+    <div class="quiz-card-header">
+      <div class="quiz-badge">{{ loop.index }}</div>
+      <div class="quiz-question-text">{{ q.text }}</div>
+    </div>
+
+    <div class="answers">
+      {% for opt in q.options %}
+        <input class="answer-radio" type="radio" id="q{{ q.id }}_o{{ opt.id }}"
+               name="{{ q.id }}" value="{{ opt.id }}">
+        <label class="answer-btn" for="q{{ q.id }}_o{{ opt.id }}">
+          {{ opt.text }}
+        </label>
+      {% endfor %}
+    </div>
+
+    <div class="quiz-nav">
+      <button type="button" class="btn" data-action="prev">Назад</button>
+      {% if loop.last %}
+        <button type="submit" class="btn" id="submitBtn" disabled>Отправить</button>
+      {% else %}
+        <button type="button" class="btn" data-action="next">Далее</button>
+      {% endif %}
+    </div>
+  </section>
+  {% endfor %}
+</form>
+
+<script>
+(function () {
+  const cards = Array.from(document.querySelectorAll('.quiz-question'));
+  const total = cards.length;
+  let idx = 0;
+
+  const counterEl = document.getElementById('qCounter');
+  const barEl = document.getElementById('progressBar');
+  const submitBtn = document.getElementById('submitBtn');
+   let timeLeft = 90;
+
+  const timerEl = document.getElementById('timerValue');
+
+  function formatTime(s) {
+    const m = Math.floor(s / 60);
+    const sec = s % 60;
+    return `${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+  }
+
+  function tick() {
+    timerEl.textContent = formatTime(timeLeft);
+
+    if (timeLeft <= 0) {
+      // время вышло — отправляем форму
+      alert('Время вышло! Ответы отправлены.');
+      document.getElementById('quizForm').submit();
+      return;
+    }
+
+    timeLeft -= 1;
+    setTimeout(tick, 1000);
+  }
+
+  tick();
+  function show(i) {
+    idx = Math.max(0, Math.min(total - 1, i));
+    cards.forEach((c, k) => c.classList.toggle('active', k === idx));
+    counterEl.textContent = `Вопрос ${idx + 1}/${total}`;
+    barEl.style.width = `${Math.round(((idx) / (total - 1 || 1)) * 100)}%`;
+    checkSubmitState();
+  }
+
+  function currentAnswered() {
+    const active = cards[idx];
+    return !!active.querySelector('input.answer-radio:checked');
+  }
+
+  function checkSubmitState() {
+    if (!submitBtn) return;
+    // включаем отправку только когда на последнем вопросе выбран ответ
+    submitBtn.disabled = !currentAnswered();
+  }
+
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('button[data-action]');
+    if (!btn) return;
+
+    const action = btn.getAttribute('data-action');
+    if (action === 'prev') show(idx - 1);
+    if (action === 'next') show(idx + 1);
+  });
+
+  // При выборе ответа — если это последний вопрос, активируем submit
+  document.querySelectorAll('input.answer-radio').forEach(r => {
+    r.addEventListener('change', () => {
+      // авто-переход на следующий вопрос (как в квизах), кроме последнего
+      if (idx < total - 1) show(idx + 1);
+      checkSubmitState();
+    });
+  });
+
+  // Если хочешь запретить отправку пока не отвечены все — включи:
+  // document.getElementById('quizForm').addEventListener('submit', (e) => {
+  //   for (const c of cards) {
+  //     if (!c.querySelector('input.answer-radio:checked')) { e.preventDefault(); alert('Ответь на все вопросы'); return; }
+  //   }
+  // });
+
+  show(0);
+})();
+</script>
+{% endblock %}

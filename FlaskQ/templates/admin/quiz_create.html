@@ -1,0 +1,205 @@
+{% extends "layout.html" %}
+{% block content %}
+<h2>Создание и импорт вопросов</h2>
+
+<form id="quizForm" method="post" enctype="multipart/form-data" class="card">
+  <label>Название викторины</label>
+  <input name="title" required>
+
+  <label>Текст под заголовком</label>
+  <input name="subtitle">
+
+  <label>Картинка викторины (опционально)</label>
+  <input type="file" name="image" accept=".png,.jpg,.jpeg,.webp">
+
+  <input type="hidden" name="questions_json" id="questions_json">
+
+  <div class="actions" style="margin-top:14px;">
+    <button type="button" class="btn" id="btnPreview">Предпросмотр</button>
+    <button type="submit" class="btn">Сохранить</button>
+    <button type="button" class="btn" id="btnAdd">+ Добавить вопрос</button>
+  </div>
+
+  <div id="questionsWrap" style="margin-top:14px;"></div>
+</form>
+
+<!-- простое модальное окно предпросмотра -->
+<div id="previewModal" class="modal" hidden>
+  <div class="modal-backdrop" id="previewBackdrop"></div>
+  <div class="modal-card">
+    <div class="row" style="justify-content: space-between;">
+      <strong>Предпросмотр</strong>
+      <button class="btn" id="btnClosePreview" type="button">Закрыть</button>
+    </div>
+    <div id="previewBody" style="margin-top:12px;"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const wrap = document.getElementById('questionsWrap');
+  wrap.addEventListener('change', (e) => {
+  const cb = e.target;
+  if (!cb.classList.contains('answer-correct')) return;
+
+  const qid = cb.dataset.qid;
+  if (!qid) return;
+
+  if (cb.checked) {
+    // выключаем остальные чекбоксы этого же вопроса
+    wrap.querySelectorAll(`.answer-correct[data-qid="${qid}"]`).forEach(x => {
+      if (x !== cb) x.checked = false;
+    });
+  }
+});
+  const btnAdd = document.getElementById('btnAdd');
+  const form = document.getElementById('quizForm');
+  const hidden = document.getElementById('questions_json');
+
+  const modal = document.getElementById('previewModal');
+  const previewBody = document.getElementById('previewBody');
+  document.getElementById('btnPreview').addEventListener('click', () => {
+    const data = collect();
+    previewBody.innerHTML = renderPreviewHTML(data);
+    modal.hidden = false;
+  });
+  document.getElementById('btnClosePreview').addEventListener('click', () => modal.hidden = true);
+
+  let counter = 0;
+
+  function questionCard(idx){
+    const qid = `q_${idx}`;
+    return `
+      <div class="card" data-idx="${idx}" style="margin-top:12px;">
+        <div class="row" style="justify-content: space-between; gap:10px;">
+          <div><strong>Вопрос ${idx+1}</strong></div>
+          <button type="button" class="btn btnDanger" data-action="remove">✕</button>
+        </div>
+
+        <label style="margin-top:10px;">Картинка к вопросу (опционально)</label>
+        <input type="file" name="q_image_${idx}" accept=".png,.jpg,.jpeg,.webp">
+
+        <label>Текст вопроса</label>
+        <input name="${qid}_text" required placeholder="Введите вопрос...">
+
+        <label>Варианты (4 шт.) + выбери правильный</label>
+
+       ${[1,2,3,4].map(i => `
+  <div class="answer-row">
+    <input
+      class="answer-correct"
+      type="checkbox"
+      data-qid="${qid}"
+      value="${i}"
+      title="Правильный"
+    >
+    <input
+      class="answer-input"
+      name="${qid}_opt_${i}"
+      placeholder="Вариант ${i}"
+      required
+    >
+  </div>
+`).join('')}
+
+        <label>Комментарий к ответу (опционально)</label>
+        <textarea name="${qid}_explanation" rows="3" placeholder="Пояснение/факт..."></textarea>
+      </div>
+    `;
+  }
+
+  function addQuestion(){
+    const idx = counter++;
+    const div = document.createElement('div');
+    div.innerHTML = questionCard(idx);
+    wrap.appendChild(div.firstElementChild);
+  }
+
+  function collect(){
+    const cards = [...wrap.querySelectorAll('[data-idx]')];
+    return cards.map(card => {
+      const idx = card.getAttribute('data-idx');
+      const text = card.querySelector(`[name="q_${idx}_text"]`).value.trim();
+      const correctEl = card.querySelector(`.answer-correct[data-qid="q_${idx}"]:checked`);
+      const correct = correctEl ? parseInt(correctEl.value, 10) : null;
+      const options = [1,2,3,4].map(i => card.querySelector(`[name="q_${idx}_opt_${i}"]`).value.trim());
+      const explanation = card.querySelector(`[name="q_${idx}_explanation"]`).value.trim();
+      return { text, options, correct, explanation };
+    });
+  }
+
+  function renderPreviewHTML(data){
+    if (!data.length) return `<p class="muted">Нет вопросов.</p>`;
+    return data.map((q, i) => `
+      <div class="card" style="margin-top:10px;">
+        <strong>${i+1}. ${escapeHtml(q.text || '')}</strong>
+        <ul style="margin-top:8px;">
+          ${q.options.map((o, j) => `
+            <li>${j+1}) ${escapeHtml(o || '')} ${q.correct === (j+1) ? '✅' : ''}</li>
+          `).join('')}
+        </ul>
+        ${q.explanation ? `<div class="muted" style="margin-top:8px;">${escapeHtml(q.explanation)}</div>` : ''}
+      </div>
+    `).join('');
+  }
+
+  function escapeHtml(s){
+    return (s || '').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'","&#039;");
+  }
+
+  wrap.addEventListener('click', (e) => {
+    const btn = e.target.closest('button[data-action="remove"]');
+    if (!btn) return;
+    const card = btn.closest('[data-idx]');
+    if (card) card.remove();
+  });
+
+  btnAdd.addEventListener('click', addQuestion);
+
+  form.addEventListener('submit', (e) => {
+    const data = collect();
+
+    // базовая валидация
+    if (!data.length) {
+      e.preventDefault();
+      alert('Добавь хотя бы 1 вопрос.');
+      return;
+    }
+    for (const q of data) {
+      if (!q.text || q.options.some(x => !x) || !q.correct) {
+        e.preventDefault();
+        alert('Заполни текст вопроса, 4 варианта и выбери правильный.');
+        return;
+      }
+    }
+
+    hidden.value = JSON.stringify(data);
+  });
+
+  // стартовый вопрос
+  addQuestion();
+})();
+// Один правильный чекбокс на вопрос
+wrap.addEventListener('change', (e) => {
+  const cb = e.target.closest('.answer-correct');
+  if (!cb) return;
+
+  const qid = cb.getAttribute('data-qid');
+  if (!qid) return;
+
+  // если включили — выключаем остальные в этом же вопросе
+  if (cb.checked) {
+    wrap.querySelectorAll(`.answer-correct[data-qid="${qid}"]`).forEach(x => {
+      if (x !== cb) x.checked = false;
+    });
+  }
+});
+
+</script>
+
+<style>
+  .btnDanger { border-color: rgba(255,80,80,.35); }
+  .modal { position: fixed; inset: 0; background: rgba(0,0,0,.6); display:flex; align-items:center; justify-content:center; padding: 18px; }
+  .modal-card { width: min(900px, 96vw); max-height: 86vh; overflow:auto; border-radius: 14px; padding: 14px; background: rgba(20,20,24,.98); border: 1px solid rgba(255,255,255,.12); }
+</style>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<section class="admin-page">
+  <div class="admin-head">
+    <h1 class="admin-title">Редактирование викторины #{{ quiz.id }}</h1>
+    <a class="btn btnSmall" href="{{ url_for('admin_panel') }}">Назад</a>
+  </div>
+
+  <div class="card" style="max-width: 720px;">
+    <form method="post" enctype="multipart/form-data">
+      <label>Название</label>
+      <input name="title" value="{{ quiz.title }}" required>
+
+      <label>Описание</label>
+      <input name="subtitle" value="{{ quiz.subtitle or '' }}">
+
+      <label>Картинка (необязательно)</label>
+      <input type="file" name="image" accept=".png,.jpg,.jpeg,.webp">
+
+      {% if quiz.image_path %}
+        <div style="margin-top:10px;">
+          <div class="muted" style="margin-bottom:6px;">Текущая:</div>
+          <img class="thumb" src="{{ url_for('static', filename=quiz.image_path) }}" alt="">
+        </div>
+      {% endif %}
+
+      <div class="actions">
+        <button class="btn" type="submit">Сохранить</button>
+      </div>
+    </form>
+  </div>
+</section>
+
+{% endblock %}

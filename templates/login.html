@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<section class="auth-page">
+  <div class="auth-card">
+
+    <h1 class="auth-title">Вход</h1>
+    <p class="auth-subtitle">Войдите, чтобы проходить викторины и попадать в таблицу лидеров.</p>
+
+    <form method="post" class="auth-form">
+      <label for="email">Email</label>
+      <input id="email" type="email" name="email" required placeholder="example@mail.com" autocomplete="email">
+
+      <label for="password">Пароль</label>
+      <input id="password" name="password" type="password" required placeholder="••••••••" autocomplete="current-password">
+
+      <button class="btn auth-btn" type="submit">Войти</button>
+    </form>
+
+    <div class="auth-footer">
+      <span class="muted">Нет аккаунта?</span>
+      <a class="auth-link" href="{{ url_for('register') }}">Регистрация</a>
+    </div>
+
+  </div>
+</section>
+
+{% endblock %}

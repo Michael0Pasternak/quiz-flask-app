@@ -1,0 +1,45 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<section class="admin-page">
+  <div class="admin-head">
+    <h1 class="admin-title">Админ-панель</h1>
+    <a class="btn btnSmall" href="{{ url_for('admin_quiz_create') }}">+ Создать викторину</a>
+  </div>
+
+  <div class="admin-tableWrap">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Название</th>
+          <th>Описание</th>
+          <th>Создана</th>
+          <th style="width:220px;">Действия</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for q in quizzes %}
+          <tr>
+            <td>{{ q.id }}</td>
+            <td><b>{{ q.title }}</b></td>
+            <td class="muted">{{ q.subtitle or '' }}</td>
+            <td class="muted">{{ q.created_at }}</td>
+            <td class="admin-actions">
+              <a class="btn btnSmall" href="{{ url_for('admin_quiz_edit', quiz_id=q.id) }}">Редактировать</a>
+
+              <form method="post"
+                    action="{{ url_for('admin_quiz_delete', quiz_id=q.id) }}"
+                    onsubmit="return confirm('Удалить викторину {{ q.title }}? Это удалит вопросы и результаты!');"
+                    style="display:inline;">
+                <button class="btn btnSmall admin-danger" type="submit">Удалить</button>
+              </form>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+{% endblock %}

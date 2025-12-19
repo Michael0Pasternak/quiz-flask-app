@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+{% block content %}
+<h2>Админ-панель</h2>
+<div class="actions">
+  <a class="btn" href="{{ url_for('admin_quiz_create') }}">Создать викторину</a>
+</div>
+
+<h3>Все викторины</h3>
+<ul class="list">
+  {% for q in quizzes %}
+    <li>
+      <a href="{{ url_for('quiz_detail', quiz_id=q.id) }}">{{ q.title }}</a>
+      <span class="muted">#{{ q.id }}</span>
+    </li>
+  {% endfor %}
+</ul>
+{% endblock %}

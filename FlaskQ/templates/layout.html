@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <title>{{ title if title else "Quiz Service" }}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <script defer src="{{ url_for('static', filename='js/main.js') }}"></script>
+</head>
+<body>
+  <header class="container header">
+    <div class="row">
+      <a class="brand" href="{{ url_for('index') }}">QuizService</a>
+      <nav class="nav">
+        <a href="{{ url_for('quizzes') }}">Викторины</a>
+        <a href="{{ url_for('leaderboard') }}">Лидерборд</a>
+        {% if current_user.id %}
+          <span class="muted">👤 {{ current_user.username }} ({{ current_user.role }})</span>
+          <a href="{{ url_for('logout') }}">Выход</a>
+          {% if current_user.role == "admin" %}
+            <a href="{{ url_for('admin_panel') }}">Админ</a>
+          {% endif %}
+        {% else %}
+          <a href="{{ url_for('login') }}">Вход</a>
+          <a href="{{ url_for('register') }}">Регистрация</a>
+        {% endif %}
+      </nav>
+    </div>
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="flash">
+          {% for m in messages %}
+            <div class="flash-item">{{ m }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+  </header>
+
+  <main class="container">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="container footer">
+    <small class="muted">Flask + PostgreSQL</small>
+  </footer>
+</body>
+</html>

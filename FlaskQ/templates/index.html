@@ -1,0 +1,11 @@
+{% extends "layout.html" %}
+{% block content %}
+  <h1>Сервис викторин</h1>
+  <p class="muted">Ищи викторины, проходи, попадай в лидерборд. Админ может создавать новые.</p>
+  <div class="actions">
+    <a class="btn" href="{{ url_for('quizzes') }}">Перейти к викторинам</a>
+    {% if current_user.role == "admin" %}
+      <a class="btn" href="{{ url_for('admin_quiz_create') }}">Создать викторину</a>
+    {% endif %}
+  </div>
+{% endblock %}
